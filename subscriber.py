@@ -27,8 +27,10 @@ def on_connect(client, userdata, flags, rc):
 
 def connect_to_db():
         #Conexión a la db
-    global conn 
-    conn = pg2.connect(host='localhost', dbname="sambilproyecto", user="postgres", password="1234")
+    global conn1, conn2, conn3
+    conn1 = pg2.connect(host='localhost', dbname="sambilproyectoventas", user="postgres", password="1234")
+    conn2 = pg2.connect(host='localhost', dbname='sambilproyectoaccesos', user='postgres', password='1234')
+    conn3 = pg2.connect(host='localhost', dbname='sambilproyectoferia', user='postgres', password='1234')
 
 def rand_mac():
     return "%02x:%02x:%02x:%02x:%02x:%02x" % (
@@ -43,7 +45,19 @@ def rand_mac():
 #Insertar smartphone
 def insert_smartphone(smartphone):
     macaddress=rand_mac()
-    with conn, conn.cursor() as cur:
+    with conn1, conn1.cursor() as cur:
+        cur.execute('''
+            INSERT INTO smartphone(id, macaddress)
+            VALUES(%s,%s);
+        ''',(smartphone["id"],macaddress))
+    
+    with conn2, conn2.cursor() as cur:
+        cur.execute('''
+            INSERT INTO smartphone(id, macaddress)
+            VALUES(%s,%s);
+        ''',(smartphone["id"],macaddress))
+
+    with conn3, conn3.cursor() as cur:
         cur.execute('''
             INSERT INTO smartphone(id, macaddress)
             VALUES(%s,%s);
@@ -51,7 +65,7 @@ def insert_smartphone(smartphone):
 
 #Insertar flujo por la puerta
 def insert_camara_access(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             INSERT INTO accesoentrada(sexo, edad, fechaacceso, idpuerta)
             VALUES(%s,%s,%s,%s);
@@ -60,7 +74,7 @@ def insert_camara_access(data):
 
 #Iniciar nueva estadía
 def insert_new_estadia(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             INSERT INTO estadia(idsmartphone, fechaentrada, idpuertaentrada)
             VALUES(%s,%s,%s);
@@ -69,7 +83,7 @@ def insert_new_estadia(data):
 
 #Finaliza una estadia
 def finish_estadia(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             UPDATE estadia 
             SET fechasalida=%s, idpuertasalida=%s
@@ -84,7 +98,7 @@ def finish_estadia(data):
 
 #Inserta flujo por una tienda
 def insert_camara_local(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             INSERT INTO accesolocal (sexo, edad, fechaacceso, idlocal)
             VALUES (%s,%s,%s,%s);
@@ -93,7 +107,7 @@ def insert_camara_local(data):
 
 #Iniciar nueva estadía en una tienda
 def insert_new_recorrido(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             INSERT INTO recorrido(idsmartphone, idlocal, fechaentrada)
             VALUES(%s,%s,%s);
@@ -102,7 +116,7 @@ def insert_new_recorrido(data):
 
 #Finalizar una estadía en una tienda
 def finish_recorrido(data):
-    with conn, conn.cursor() as cur:
+    with conn2, conn2.cursor() as cur:
         query='''
             UPDATE recorrido
             SET fechasalida=%s
@@ -118,14 +132,14 @@ def finish_recorrido(data):
 #Insertar una nueva factura
 def insert_new_factura(data):
     if data["idsmartphone"]==0:
-        with conn, conn.cursor() as cur:
+        with conn1, conn1.cursor() as cur:
             query='''
                 INSERT INTO factura (cicomprador, idlocal, monto, fechacompra)
                 VALUES(%s,%s,%s,%s);
             '''
             cur.execute(query,(data["cicomprador"],data["idlocal"],data["monto"],data["fechacompra"])) 
     else:
-        with conn, conn.cursor() as cur:
+        with conn1, conn1.cursor() as cur:
             query='''
                 INSERT INTO factura (cicomprador, idlocal, monto, fechacompra, idsmartphone)
                 VALUES(%s,%s,%s,%s,%s);
@@ -134,7 +148,7 @@ def insert_new_factura(data):
 
 #Insertar un nuevo estado de una mesa
 def insert_mesa_estado(data):
-    with conn, conn.cursor() as cur:
+    with conn3, conn3.cursor() as cur:
         query='''
             INSERT INTO estadomesa(idmesa, fechaestado, ocupado)
             VALUES(%s,%s,%s);
@@ -143,7 +157,7 @@ def insert_mesa_estado(data):
 
 #Insertar un nuevo monitoreo de mesa
 def start_mesa_ocupacion(data):
-    with conn, conn.cursor() as cur:
+    with conn3, conn3.cursor() as cur:
         query='''
             INSERT INTO monitoreomesa(idsmartphone, idmesa, fechaocupado)
             VALUES(%s,%s,%s);
@@ -152,7 +166,7 @@ def start_mesa_ocupacion(data):
 
 #Finalizar una ocupación de una mesa
 def finish_mesa_ocupacion(data):
-    with conn, conn.cursor() as cur:
+    with conn3, conn3.cursor() as cur:
         query='''
             UPDATE monitoreomesa
             SET fechadesocupado=%s
@@ -192,7 +206,9 @@ def on_message(client, userdata, message):
         start_mesa_ocupacion(y)
     if message.topic == canalMesaSensorDescupado:
         finish_mesa_ocupacion(y)
-    conn.commit()
+    conn1.commit()
+    conn2.commit()
+    conn3.commit()
 
 def main():
 

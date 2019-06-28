@@ -77,16 +77,20 @@ def on_connect(client, userdata, flags, rc):
 
 def connect_to_db():
         #Conexión a la db
-    global conn
-    conn = pg2.connect(host='localhost', dbname="sambilproyecto", user="postgres", password="1234")
+    global conn1, conn2, conn3
+    conn1 = pg2.connect(host='localhost', dbname="sambilproyectoventas", user="postgres", password="1234")
+    conn2 = pg2.connect(host='localhost', dbname="sambilproyectoaccesos", user="postgres", password="1234")
+    conn3 = pg2.connect(host='localhost', dbname="sambilproyectoferia", user="postgres", password="1234")
         #Cursor para operar
-    global cur 
-    cur = conn.cursor()
+    global cur1, cur2, cur3
+    cur1 = conn1.cursor()
+    cur2 = conn2.cursor()
+    cur3 = conn3.cursor()
 
 #Instanciar smartphones existentes
 def instanciateSmartphones():
-    cur.execute("SELECT id FROM smartphone ORDER BY id DESC;")
-    aux = cur.fetchall()
+    cur1.execute("SELECT id FROM smartphone ORDER BY id DESC;")
+    aux = cur1.fetchall()
     for x in aux:
         if x==0:    
             global smartphonesQtty
@@ -95,8 +99,8 @@ def instanciateSmartphones():
 
 #Instanciar cámaras y conectarlas al broker
 def instanciateCamaras():
-    cur.execute("SELECT id FROM camara;")
-    aux = cur.fetchall()
+    cur2.execute("SELECT id FROM camara;")
+    aux = cur2.fetchall()
     for x in aux:
         toInsert=ClienteMqtt(x[0])
         toInsert.connect_to_broker()
@@ -107,8 +111,8 @@ def instanciateCamaras():
 
 #Instanciar cámaras y conectarlos al broker
 def instanciateSensores():
-    cur.execute("SELECT id FROM sensormesa;")
-    aux = cur.fetchall()
+    cur3.execute("SELECT id FROM sensormesa;")
+    aux = cur3.fetchall()
     for x in aux:
         toInsert=ClienteMqtt(x[0])
         toInsert.connect_to_broker()
@@ -116,8 +120,8 @@ def instanciateSensores():
 
 #Instanciar beacons y conectarlos al broker
 def instanciateBeacons():
-    cur.execute("SELECT id FROM beacon;")
-    aux = cur.fetchall()
+    cur2.execute("SELECT id FROM beacon;")
+    aux = cur2.fetchall()
     for x in aux:
         toInsert=ClienteMqtt(x[0])
         toInsert.connect_to_broker()
@@ -129,8 +133,8 @@ def instanciateBeacons():
 #Instanciar puertas
 def instanciatePuertas():
     #Puertas normales
-    cur.execute("SELECT numero, emergencia FROM puerta;")
-    aux = cur.fetchall()
+    cur2.execute("SELECT numero, emergencia FROM puerta;")
+    aux = cur2.fetchall()
     for x in aux:
         toInsert=DataMaestra(x[0])
         #Es una puerta de emergencias
@@ -142,16 +146,16 @@ def instanciatePuertas():
 
 #Instanciar locales
 def instanciateLocales():
-    cur.execute("SELECT id FROM local;")
-    aux = cur.fetchall()
+    cur2.execute("SELECT id FROM local;")
+    aux = cur2.fetchall()
     for x in aux:
         toInsert=DataMaestra(x[0])
         locales.append(toInsert)
 
 #Instanciar mesas
 def instanciateMesas():
-    cur.execute("SELECT id FROM mesa;")
-    aux = cur.fetchall()
+    cur3.execute("SELECT id FROM mesa;")
+    aux = cur3.fetchall()
     for x in aux:
         toInsert=DataMaestra(x[0])
         mesas.append(toInsert)
@@ -393,19 +397,19 @@ def create_cliente(ci):
             cliente=Cliente(ci,sexo,edad,smartphone)
             clientesInCC.append(cliente)
             register_smartphone(smartphone)
-            t.sleep(0.3)
+            t.sleep(0.1)
 
     #Cámara que detecta el acceso
     camara=camarasAcceso[(r.randint(1,len(camarasAcceso))-1)]
     #Puerta por la que entra
     puerta=puertas[(r.randint(1,len(puertas))-1)]
     publish_access(camara, cliente, puerta)
-    t.sleep(0.3)
+    t.sleep(0.1)
     if cliente.id_smartphone > 0:
         #Si tiene smartphone el beacon inicia una estadia para el smartphone
         beacon=beaconsAcceso[(r.randint(1,len(beaconsAcceso))-1)]
         publish_start_estadia(beacon, cliente.id_smartphone, puerta)
-        t.sleep(0.3)
+        t.sleep(0.1)
 
 #Ingreso de personas sleep
 def ingreso_personas():
@@ -442,7 +446,7 @@ def ingreso_personas():
                     #Puerta de acceso
                     puerta=puertas[(r.randint(1,len(puertas))-1)]
                     publish_access(camara, cliente, puerta)
-                    t.sleep(0.3)
+                    t.sleep(0.1)
                     
                     #Si tiene smartphone hay una nueva estadía
                     if cliente.id_smartphone>0:
@@ -450,7 +454,7 @@ def ingreso_personas():
                         #Beacon que detecta la nueva estadía
                         beacon=beaconsAcceso[(r.randint(1,len(beaconsAcceso))-1)]
                         publish_start_estadia(beacon, cliente.id_smartphone, puerta)
-                        t.sleep(0.3)
+                        t.sleep(0.1)
 
 #Recorrido de las personas en el CC
 def recorrido_personas():
@@ -495,7 +499,7 @@ def recorrido_personas():
                     sensor=sensores[((r.randint(1,len(sensores)))-1)]
 
                     publish_ocupa_mesa(mesa, sensor)
-                    t.sleep(0.3)
+                    t.sleep(0.1)
 
                     #Cliente que ocupa la mesa
                     cliente=clientesInCC.pop(i)
@@ -504,7 +508,7 @@ def recorrido_personas():
                     #Si tiene smartphone
                     if cliente.id_smartphone>0:
                         publish_sensor_ocupa_mesa(mesa, cliente.id_smartphone, sensor)
-                        t.sleep(0.3)
+                        t.sleep(0.1)
 
                 else: #No hay mesas disponibles
 
@@ -537,13 +541,13 @@ def recorrido_personas():
                     clientesInLocales.append([cliente, local])
 
                     publish_acceso_tienda_entrada(cliente, local, camara)
-                    t.sleep(0.3)
+                    t.sleep(0.1)
                     
                     #Beacon detecta que entra un smartphone
                     if cliente.id_smartphone != 0:
                         beacon=beaconsLocal[(r.randint(1,len(beaconsLocal))-1)]
                         publish_recorrido_start(cliente.id_smartphone, local, beacon)
-                        t.sleep(0.3)
+                        t.sleep(0.1)
                     
                 #24% de las veces no hace nada
                 else:
@@ -562,7 +566,7 @@ def salir_del_cc(i):
     #Puerta por la cual sale
     puerta=puertas[(r.randint(1,len(puertas)))-1]
     publish_salida_puerta(camara, cliente, puerta)
-    t.sleep(0.3)
+    t.sleep(0.1)
     
     #Si tiene smartphone
     if cliente.id_smartphone>0:
@@ -571,7 +575,7 @@ def salir_del_cc(i):
         minutes=r.randint(45,59)
         fechaSalida=dt.datetime(fecha.year, fecha.month, fecha.day, fecha.hour, minutes)
         publish_finish_estadia(beacon, cliente.id_smartphone, puerta, fechaSalida)
-        t.sleep(0.3)
+        t.sleep(0.1)
 
 #Personas que están en mesas y deciden pararse
 def desocupan_mesas():
@@ -601,11 +605,11 @@ def desocupan_mesas():
                 #Detecta que se para de la mesa
                 print('TIENE SMARTPHONE')
                 publish_sensor_libera_mesa(mesa, cliente.id_smartphone, sensor)
-                t.sleep(0.3)
+                t.sleep(0.1)
 
             #Se libera una mesa
             publish_libera_mesa(mesa, sensor)
-            t.sleep(0.3)
+            t.sleep(0.1)
 
         #No se para de la mesa 30% de las veces
         else:
@@ -632,7 +636,7 @@ def salen_de_local():
         #Hace una compra
         if decisionCompra == 0:
             publish_factura(cliente, local, camara)
-            t.sleep(0.3)
+            t.sleep(0.1)
         
         #70% de las vecces sale del local
         if decisionSalirLocal<0.53:
@@ -647,13 +651,13 @@ def salen_de_local():
             
             #Sale de la tienda
             publish_acceso_tienda_salida(cliente, local, camara)
-            t.sleep(0.3)
+            t.sleep(0.1)
                 #Si tiene smartphone registra la salida
             if cliente.id_smartphone != 0:
                 beacon=beaconsLocal[(r.randint(1,len(beaconsLocal))-1)]
                 print('Tiene smartphone')
                 publish_recorrido_finish(cliente.id_smartphone, local, beacon)
-                t.sleep(0.3)
+                t.sleep(0.1)
         #30% de las veces no sale del local
         else:
             print(cliente.ci,' Se mantiene en el local ',local.id)
@@ -666,7 +670,7 @@ def check_salida():
     #Avanza 1 hora
     fecha=dt.datetime(year=fecha.year,month=fecha.month,day=fecha.day,hour=(fecha.hour+1))
     print(fecha)
-    t.sleep(1)
+    t.sleep(0.5)
     #Si son más de las 9pm
     if fecha.hour > 21:
         #Días restantes de simulación
@@ -692,14 +696,14 @@ def check_salida():
             camara=camarasLocal[(r.randint(1,len(camarasLocal)))-1]        
             #Sale de la tienda
             publish_acceso_tienda_salida(cliente, local, camara)
-            t.sleep(0.3)
+            t.sleep(0.1)
             
             #Si tiene smartphone registra la salida
             if cliente.id_smartphone != 0:
                 beacon=beaconsLocal[(r.randint(1,len(beaconsLocal))-1)]
                 print('Tiene smartphone')
                 publish_recorrido_finish(cliente.id_smartphone, local, beacon)
-                t.sleep(0.3)
+                t.sleep(0.1)
 
         #Cliente que están sentados en mesas
         print('Quedan ', len(clientesInMesas),' en las locales, van a desocuparlas')
@@ -721,11 +725,11 @@ def check_salida():
             if cliente.id_smartphone != 0:
                 print('TIENE SMARTPHONE')
                 publish_sensor_libera_mesa(mesa, cliente.id_smartphone, sensor)
-                t.sleep(0.3)
+                t.sleep(0.1)
 
             #Se libera una mesa
             publish_libera_mesa(mesa, sensor)
-            t.sleep(0.3)
+            t.sleep(0.1)
         
         #Ahora van a salir todos
         print('Aún hay ', len(clientesInCC),' personas en el CC, ahora saldrán')
@@ -738,7 +742,7 @@ def check_salida():
             puerta=puertas[(r.randint(1,len(puertas))-1)]
             publish_salida_puerta(camara, cliente, puerta)
             print('Sale ',cliente.ci)
-            t.sleep(0.3)
+            t.sleep(0.1)
             #Si tiene smartphone
             if cliente.id_smartphone != 0:
                 print('Tiene smartphone')
@@ -747,11 +751,11 @@ def check_salida():
                 minutes=r.randint(45,59)
                 fechaSalida=dt.datetime(fecha.year, fecha.month, fecha.day, fecha.hour, minutes)
                 publish_finish_estadia(beacon, cliente.id_smartphone, puerta, fechaSalida)
-                t.sleep(0.3)
+                t.sleep(0.1)
             #Actualización de estructuras de datos
             clientesOutOfCC.append(cliente)
         
-        t.sleep(3)
+        t.sleep(1)
             
 def main():
     connect_to_db()
