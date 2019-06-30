@@ -509,95 +509,6 @@
     </hop>
   </order>
   <step>
-    <name>Calculo de Fechas</name>
-    <type>Formula</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <formula>
-      <field_name>year</field_name>
-      <formula_string>year([dimensiondate])</formula_string>
-      <value_type>Number</value_type>
-      <value_length>4</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>quarter</field_name>
-      <formula_string>int(month([dimensiondate])/3 + .9)</formula_string>
-      <value_type>Number</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>month</field_name>
-      <formula_string>month([dimensiondate])</formula_string>
-      <value_type>Number</value_type>
-      <value_length>2</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>day</field_name>
-      <formula_string>day([dimensiondate])</formula_string>
-      <value_type>Number</value_type>
-      <value_length>2</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>weekday</field_name>
-      <formula_string>weekday([dimensiondate];2)</formula_string>
-      <value_type>Number</value_type>
-      <value_length>1</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>monthname</field_name>
-      <formula_string>MID("   EneFebMarAbrMayJunJulAgoSepOctNovDic"; month([dimensiondate])*3+1; 3)</formula_string>
-      <value_type>String</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>dayname</field_name>
-      <formula_string>MID("   DomLunMarMieJueVieSab"; weekday([dimensiondate];1)*3+1; 3 )</formula_string>
-      <value_type>String</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <formula>
-      <field_name>dayinyear</field_name>
-      <formula_string>DateDif(date(year([dimensiondate]);1;1);[dimensiondate];"d")+1</formula_string>
-      <value_type>Number</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <replace_field/>
-    </formula>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>544</xloc>
-      <yloc>272</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
     <name>Agregar dias</name>
     <type>Sequence</type>
     <description/>
@@ -628,6 +539,95 @@
     </remotesteps>
     <GUI>
       <xloc>256</xloc>
+      <yloc>272</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Calculo de Fechas</name>
+    <type>Formula</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <formula>
+      <field_name>year</field_name>
+      <formula_string>year([dimensiondate])</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>4</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>quarter</field_name>
+      <formula_string>int(month([dimensiondate])/3 + .9)</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>month</field_name>
+      <formula_string>month([dimensiondate])</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>2</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>day</field_name>
+      <formula_string>day([dimensiondate])</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>2</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>weekday</field_name>
+      <formula_string>weekday([dimensiondate];2)</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>1</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>monthname</field_name>
+      <formula_string>MID("   EneFebMarAbrMayJunJulAgoSepOctNovDic"; month([dimensiondate])*3+1; 3)</formula_string>
+      <value_type>String</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>dayname</field_name>
+      <formula_string>MID("   DomLunMarMieJueVieSab"; weekday([dimensiondate];1)*3+1; 3 )</formula_string>
+      <value_type>String</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>dayinyear</field_name>
+      <formula_string>DateDif(date(year([dimensiondate]);1;1);[dimensiondate];"d")+1</formula_string>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>544</xloc>
       <yloc>272</yloc>
       <draw>Y</draw>
     </GUI>

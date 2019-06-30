@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>DI facturas de ventas</name>
+    <name>Ventas del último mes</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
     </parameters>
@@ -427,18 +428,18 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2019/06/29 11:08:42.647</created_date>
+    <created_date>2019/06/29 17:27:55.348</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2019/06/29 11:08:42.647</modified_date>
+    <modified_date>2019/06/29 17:27:55.348</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
     <notepad>
-      <note>Adquisición</note>
-      <xloc>80</xloc>
-      <yloc>160</yloc>
-      <width>73</width>
+      <note>Aquisición</note>
+      <xloc>96</xloc>
+      <yloc>208</yloc>
+      <width>66</width>
       <heigth>26</heigth>
       <fontname>Segoe UI</fontname>
       <fontsize>9</fontsize>
@@ -457,8 +458,8 @@
     </notepad>
     <notepad>
       <note>Armonización</note>
-      <xloc>288</xloc>
-      <yloc>112</yloc>
+      <xloc>464</xloc>
+      <yloc>176</yloc>
       <width>84</width>
       <heigth>26</heigth>
       <fontname>Segoe UI</fontname>
@@ -478,8 +479,8 @@
     </notepad>
     <notepad>
       <note>Transformación de negocios</note>
-      <xloc>560</xloc>
-      <yloc>64</yloc>
+      <xloc>912</xloc>
+      <yloc>176</yloc>
       <width>161</width>
       <heigth>26</heigth>
       <fontname>Segoe UI</fontname>
@@ -499,8 +500,8 @@
     </notepad>
     <notepad>
       <note>Reportería</note>
-      <xloc>960</xloc>
-      <yloc>32</yloc>
+      <xloc>1392</xloc>
+      <yloc>176</yloc>
       <width>65</width>
       <heigth>26</heigth>
       <fontname>Segoe UI</fontname>
@@ -623,36 +624,86 @@
   </connection>
   <order>
     <hop>
-      <from>Entrada Ventas de Locales Ultimo Dia</from>
-      <to>Transformar de timestamp a date</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Ordenar filas</from>
-      <to>Agrupar por local y fecha limpia</to>
+      <from>Ordenar por local, mes y año</from>
+      <to>Agrupar por local, mes y año</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Transformar de timestamp a date</from>
-      <to>Agregar Dimension de tiempo</to>
+      <to>Agregar dimension tiempo</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Agregar Dimension de tiempo</from>
-      <to>Ordenar filas</to>
+      <from>Agregar dimension tiempo</from>
+      <to>Ordenar por local, mes y año</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Agrupar por local y fecha limpia</from>
+      <from>Agrupar por local, mes y año</from>
       <to>Insertar en el datawarehouse</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Extraer facturas de local del último mes</from>
+      <to>Ordenar por local</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Extraer local, franquicia, sector y piso</from>
+      <to>Ordenar por local 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ordenar por local</from>
+      <to>Join por el local</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ordenar por local 2</from>
+      <to>Join por el local</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Join por el local</from>
+      <to>Transformar de timestamp a date</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Agregar dimension tiempo</from>
+      <to>Ordenar por franquicia, mes y año</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Agregar dimension tiempo</from>
+      <to>Ordenar por sector, piso, mes y año</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ordenar por sector, piso, mes y año</from>
+      <to>Agrupar por sector, piso, mes y año</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ordenar por franquicia, mes y año</from>
+      <to>Agrupar por franquicia, mes y año</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Agrupar por franquicia, mes y año</from>
+      <to>Insertar en el datawarehouse 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Agrupar por sector, piso, mes y año</from>
+      <to>Insertar en el datawarehouse 3</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Agregar Dimension de tiempo</name>
+    <name>Agregar dimension tiempo</name>
     <type>Formula</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -660,8 +711,8 @@
       <schema_name/>
     </partitioning>
     <formula>
-      <field_name>dayinyear</field_name>
-      <formula_string>DateDif(date(year([fecha]);1;1);[fecha];"d")+1</formula_string>
+      <field_name>month</field_name>
+      <formula_string>month([fecha])</formula_string>
       <value_type>Integer</value_type>
       <value_length>-1</value_length>
       <value_precision>-1</value_precision>
@@ -671,7 +722,7 @@
       <field_name>year</field_name>
       <formula_string>year([fecha])</formula_string>
       <value_type>Integer</value_type>
-      <value_length>4</value_length>
+      <value_length>-1</value_length>
       <value_precision>-1</value_precision>
       <replace_field/>
     </formula>
@@ -684,13 +735,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>496</xloc>
-      <yloc>128</yloc>
+      <xloc>832</xloc>
+      <yloc>320</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Agrupar por local y fecha limpia</name>
+    <name>Agrupar por local, mes y año</name>
     <type>GroupBy</type>
     <description/>
     <distribute>Y</distribute>
@@ -713,7 +764,7 @@
         <name>local</name>
       </field>
       <field>
-        <name>dayinyear</name>
+        <name>month</name>
       </field>
       <field>
         <name>year</name>
@@ -736,13 +787,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
-      <yloc>128</yloc>
+      <xloc>1216</xloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Entrada Ventas de Locales Ultimo Dia</name>
+    <name>Extraer facturas de local del último mes</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -754,15 +805,12 @@
     </partitioning>
     <connection>sambilproyecto_ventas</connection>
     <sql>SELECT
-  f.idlocal
-, f.monto
-, f.fechacompra
-FROM factura AS f
-	INNER JOIN local AS l
-		ON f.idlocal = l.id
+  idlocal
+, monto
+, fechacompra
+FROM factura
 WHERE
-	EXTRACT(DAY FROM fechacompra) = EXTRACT(DAY FROM CURRENT_DATE)-1 AND
-	EXTRACT(MONTH FROM fechacompra) = EXTRACT(MONTH FROM CURRENT_DATE) AND
+	EXTRACT(MONTH FROM fechacompra) != 6 AND
 	EXTRACT(YEAR FROM fechacompra) = EXTRACT(YEAR FROM CURRENT_DATE)
 </sql>
     <limit>0</limit>
@@ -780,7 +828,7 @@ WHERE
     </remotesteps>
     <GUI>
       <xloc>112</xloc>
-      <yloc>208</yloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -797,7 +845,7 @@ WHERE
     </partitioning>
     <connection>sambilproyecto_datawarehouse</connection>
     <schema>public</schema>
-    <table>ventasdiariaslocal</table>
+    <table>ventasmensualeslocal</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -814,20 +862,20 @@ WHERE
     <return_field/>
     <fields>
       <field>
-        <column_name>dayinyear</column_name>
-        <stream_name>dayinyear</stream_name>
-      </field>
-      <field>
-        <column_name>year</column_name>
-        <stream_name>year</stream_name>
-      </field>
-      <field>
         <column_name>local</column_name>
         <stream_name>local</stream_name>
       </field>
       <field>
         <column_name>monto</column_name>
         <stream_name>monto</stream_name>
+      </field>
+      <field>
+        <column_name>month</column_name>
+        <stream_name>month</stream_name>
+      </field>
+      <field>
+        <column_name>year</column_name>
+        <stream_name>year</stream_name>
       </field>
     </fields>
     <attributes/>
@@ -839,13 +887,13 @@ WHERE
       </output>
     </remotesteps>
     <GUI>
-      <xloc>992</xloc>
-      <yloc>96</yloc>
+      <xloc>1408</xloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Ordenar filas</name>
+    <name>Ordenar por local, mes y año</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -872,7 +920,7 @@ WHERE
         <presorted>N</presorted>
       </field>
       <field>
-        <name>dayinyear</name>
+        <name>month</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <collator_enabled>N</collator_enabled>
@@ -897,8 +945,8 @@ WHERE
       </output>
     </remotesteps>
     <GUI>
-      <xloc>624</xloc>
-      <yloc>128</yloc>
+      <xloc>1008</xloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -915,6 +963,9 @@ WHERE
     </partitioning>
     <fields>
       <select_unspecified>N</select_unspecified>
+      <remove>
+        <name>id</name>
+      </remove>
       <meta>
         <name>idlocal</name>
         <rename>local</rename>
@@ -966,6 +1017,57 @@ WHERE
         <currency_symbol/>
         <storage_type/>
       </meta>
+      <meta>
+        <name>idfranquicia</name>
+        <rename>franquicia</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+      <meta>
+        <name>idpiso</name>
+        <rename>piso</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+      <meta>
+        <name>idsector</name>
+        <rename>sector</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -976,8 +1078,483 @@ WHERE
       </output>
     </remotesteps>
     <GUI>
-      <xloc>320</xloc>
-      <yloc>160</yloc>
+      <xloc>656</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Extraer local, franquicia, sector y piso</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>sambilproyecto_ventas</connection>
+    <sql>SELECT
+  id
+, idpiso
+, idsector
+, idfranquicia
+FROM "local"
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>112</xloc>
+      <yloc>368</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ordenar por local</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>idlocal</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>272</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ordenar por local 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>368</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join por el local</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>INNER</join_type>
+    <step1>Ordenar por local</step1>
+    <step2>Ordenar por local 2</step2>
+    <keys_1>
+      <key>idlocal</key>
+    </keys_1>
+    <keys_2>
+      <key>id</key>
+    </keys_2>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>496</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ordenar por franquicia, mes y año</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>franquicia</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1008</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ordenar por sector, piso, mes y año</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>sector</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>piso</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1008</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Agrupar por franquicia, mes y año</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>N</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>franquicia</name>
+      </field>
+      <field>
+        <name>month</name>
+      </field>
+      <field>
+        <name>year</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>monto</aggregate>
+        <subject>monto</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1216</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Agrupar por sector, piso, mes y año</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>N</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>sector</name>
+      </field>
+      <field>
+        <name>piso</name>
+      </field>
+      <field>
+        <name>month</name>
+      </field>
+      <field>
+        <name>year</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>monto</aggregate>
+        <subject>monto</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1216</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Insertar en el datawarehouse 2</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>sambilproyecto_datawarehouse</connection>
+    <schema>public</schema>
+    <table>ventasmensualesfranquicia</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1408</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Insertar en el datawarehouse 3</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>sambilproyecto_datawarehouse</connection>
+    <schema>public</schema>
+    <table>ventasmensualessectorpiso</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1408</xloc>
+      <yloc>416</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
