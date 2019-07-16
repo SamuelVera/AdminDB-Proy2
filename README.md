@@ -1,2 +1,3 @@
-# AdminDB-Proy2
-# Proyecto 2 de Administración de Bases de Datos
+# Data Analysis for a Simulated Smart Shopping Center
+# Project Structure
+This project consists of 3 Transactional databases and a Datawarehouse managed with PostgreSQL. The backup files are inside the folder "Backups de las DBs"
